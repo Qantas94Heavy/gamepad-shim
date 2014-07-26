@@ -1,0 +1,20 @@
+{ "globals":
+    { "require": false
+	, "define": false
+    }
+, "laxcomma": true
+, "laxbreak": true
+, "eqnull": true
+, "globalstrict": true
+, "curly": false
+, "browser": true
+, "es3": true
+, "devel": true
+, "debug": true
+, "funcscope": true
+, "unused": true
+, "undef": true
+, "bitwise": true
+, "-W079": false
+, "-W004": false
+}
