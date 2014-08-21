@@ -8,7 +8,7 @@ define(function () {
   flash.id = 'gamepad-shim';
   
   var altText = document.createTextNode('It appears Adobe Flash Player is not enabled. Since your browser does not support the HTML5 Gamepad API, you must enable Adobe Flash Player to use your joystick.');
-  flash.appendChild(flash);  
+  flash.appendChild(altText);  
   
   // <object> tags cannot appear in head
   document.body.appendChild(flash);
