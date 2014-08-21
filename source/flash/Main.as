@@ -2,7 +2,9 @@ package {
   import flash.display.Sprite;
   import flash.external.ExternalInterface;
   import flash.ui.GameInput;
+  import flash.ui.GameInputDevice;
   import flash.events.GameInputEvent;
+  
   public class Main extends Sprite {
     private var gameInput:GameInput = new GameInput();
     
@@ -30,7 +32,9 @@ package {
       gameInput.addEventListener(GameInputEvent.DEVICE_REMOVED, onGamepadDisconnected);
       
       for (var i:int = 0; i < GameInput.numDevices; ++i) {
-        ExternalInterface.call('GamepadEvent._connect', GameInput.getDeviceAt(i));
+		var device:GameInputDevice = GameInput.getDeviceAt(i);
+        ExternalInterface.call('GamepadEvent._connect', device);
+		gamepads.push(device);
       }
     }
   }
