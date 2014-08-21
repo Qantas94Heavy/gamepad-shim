@@ -25,8 +25,25 @@ package {
       
       for (var i:int = 0; i < device.numControls; ++i) {
         var control:GameInputControl = device.getControlAt(i);
-        if (control.id.slice(0, 4) === 'AXIS') axes.push(control);
-        else buttons.push(control);
+        
+        var value:Number = control.value;
+        var minValue:Number = control.minValue;
+        var maxValue:Number = control.maxValue;
+        
+        if (control.id.slice(0, 4) === 'AXIS') {          
+          // normalise axis value to range [-1, 1]
+          if (minValue === -1 && maxValue === 1) axes.push(value);
+          else axes.push((control.value - control.minValue) / (control.maxValue - control.minValue) * 2 - 1);
+        } else {
+          // normalise button value to range [0, 1]
+          var buttonValue:Number = minValue === 0 && maxValue === 1
+                                 ? value
+                                 : (control.value - control.minValue) / (control.maxValue - control.minValue);
+          
+         // TODO: check threshold value is accurate
+          var button:Object = { pressed: buttonValue > 0.9, value: buttonValue };
+          buttons.push(button);
+        }
       }
       
       var gamepad:Object = { id: device.id, axes: axes, buttons: buttons, connected: device.enabled, index: gamepads.length, mapping: '' };
