@@ -1,8 +1,9 @@
 package {
+  import flash.display.Sprite;
   import flash.external.ExternalInterface;
   import flash.ui.GameInput;
   import flash.events.GameInputEvent;
-  public class Main {
+  public class Main extends Sprite {
     private var gameInput:GameInput = new GameInput();
     
     private var gamepads:Array = [];
