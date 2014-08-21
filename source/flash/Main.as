@@ -1,8 +1,10 @@
 package {
   import flash.display.Sprite;
   import flash.external.ExternalInterface;
+  
   import flash.ui.GameInput;
   import flash.ui.GameInputDevice;
+  import flash.ui.GameInputControl;
   import flash.events.GameInputEvent;
   
   public class Main extends Sprite {
@@ -17,12 +19,20 @@ package {
     
     private function addDevice(device:GameInputDevice):void {
       device.enabled = true;
-      var controls:Array = [];
+    
+      var axes:Array = [];
+      var buttons:Array = [];
+      
       for (var i:int = 0; i < device.numControls; ++i) {
-        controls.push(device.getControlAt(i));
+        var control:GameInputControl = device.getControlAt(i);
+        if (control.id.slice(0, 4) === 'AXIS') axes.push(control);
+        else buttons.push(control);
       }
-      ExternalInterface.call('GamepadEvent._connect', device, controls);
-      gamepads.push([device, controls]);
+      
+      var gamepad:Object = { id: device.id, axes: axes, buttons: buttons, connected: device.enabled, index: gamepads.length, mapping: '' };
+      
+      ExternalInterface.call('GamepadEvent._connect', gamepad);
+      gamepads.push(gamepad);
     }
     
     private function onGamepadConnected(event:GameInputEvent):void {
