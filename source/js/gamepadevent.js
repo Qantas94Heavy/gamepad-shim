@@ -18,7 +18,7 @@ define(['gamepad'], function (Gamepad) {
       , configurable: true
       , value: eventInitDict.gamepad
       });
-      else throw new TypeError("Failed to construct 'GamepadEvent': The 'gamepad' property does not have a Gamepad type.");
+      //else throw new TypeError("Failed to construct 'GamepadEvent': The 'gamepad' property does not have a Gamepad type.");
     }
     
     // not very important, all it does is make constructor the correct property and toString generate the correct value
@@ -81,10 +81,15 @@ define(['gamepad'], function (Gamepad) {
   });
   
   // let's just add our own dispatch event sugar here
-  GamepadEvent._connect = function (id, axes, buttons) {
+  GamepadEvent._connect = function (gamepad, id, axes, buttons) {
     var newGamepad = Object.create(Gamepad.prototype);
-    
-    newGamepad.id = 
   
-    window.dispatchEvent(new GamepadEvent("gamepadconnected", { gamepad: 
+    window.dispatchEvent(new GamepadEvent("gamepadconnected", { gamepad: gamepad }));
+  }
+  
+  GamepadEvent._disconnect = function (gamepad, id, axes, buttons) {
+    var newGamepad = Object.create(Gamepad.prototype);
+  
+    window.dispatchEvent(new GamepadEvent("gamepaddisconnected", { gamepad: gamepad }));
+  }
 });

@@ -19,4 +19,4 @@ interface GamepadButton {
     readonly    attribute boolean pressed;
     readonly    attribute double  value;
 };
-*?
+*/
