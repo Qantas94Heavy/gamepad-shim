@@ -15,9 +15,17 @@ package {
       return gamepads;
     }
     
+    private function addDevice(device:GameInputDevice):void {
+      var controls:Array = [];
+      for (var i:int = 0; i < device.numControls; ++i) {
+        controls.push(device.getControlAt(i));
+      }
+      ExternalInterface.call('GamepadEvent._connect', device, controls);
+      gamepads.push([device, controls]);
+    }
+    
     private function onGamepadConnected(event:GameInputEvent):void {
-      ExternalInterface.call('GamepadEvent._connect', event.device);
-      gamepads.push(event.device);
+      addDevice(event.device);
     }
     
     private function onGamepadDisconnected(event:GameInputEvent):void {
@@ -32,9 +40,7 @@ package {
       gameInput.addEventListener(GameInputEvent.DEVICE_REMOVED, onGamepadDisconnected);
       
       for (var i:int = 0; i < GameInput.numDevices; ++i) {
-		var device:GameInputDevice = GameInput.getDeviceAt(i);
-        ExternalInterface.call('GamepadEvent._connect', device);
-		gamepads.push(device);
+        addDevice(GameInput.getDeviceAt(i));
       }
     }
   }
