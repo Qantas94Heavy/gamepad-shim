@@ -16,6 +16,7 @@ package {
     }
     
     private function addDevice(device:GameInputDevice):void {
+      device.enabled = true;
       var controls:Array = [];
       for (var i:int = 0; i < device.numControls; ++i) {
         controls.push(device.getControlAt(i));
@@ -40,13 +41,7 @@ package {
       gameInput.addEventListener(GameInputEvent.DEVICE_REMOVED, onGamepadDisconnected);
       
       for (var i:int = 0; i < GameInput.numDevices; ++i) {
-        var device:GameInputDevice = GameInput.getDeviceAt(i);
-        var controls:Array = [];
-        for (var j:int = 0; j < device.numControls; ++j) {
-          controls.push(device.getControlAt(j));
-        }
-        ExternalInterface.call('GamepadEvent._connect', device, controls);
-        gamepads.push([device, controls]);
+        addDevice(GameInput.getDeviceAt(i));
       }
     }
   }
