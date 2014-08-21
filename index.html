@@ -3,7 +3,13 @@
 <head>
 	<meta charset="utf-8">
 	<title> &ndash; GamepadsOut</title>
-  <script type="application/ecmascript" src="source/js/require.js" data-main="source/js/main.js"></script>
+	<script>
+	(function (a) {
+		a = document.createElement('a');
+		a.src = 'source/js/require.js?_=' + Date.now();
+		a.setAttribute('data-main', 'source/js/main.js';
+		document.head.appendChild(a);
+	})();
 </head>
 <body>
 	<p>Hello world!</p>
