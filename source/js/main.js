@@ -1,5 +1,7 @@
 'use strict';
 
+require.config({ urlArgs: "_=" + Date.now() });
+
 define(['flash', 'gamepad', 'gamepadbutton', 'gamepadevent'], function (flash, Gamepad, GamepadButton, GamepadEvent) {
   // we don't actually do anything with these
   if (typeof window.Gamepad !== 'function') Object.defineProperty(window, 'Gamepad',
