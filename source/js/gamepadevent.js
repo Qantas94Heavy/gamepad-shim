@@ -12,7 +12,7 @@ define(['gamepad'], function (Gamepad) {
     var eventBase = new Event(type, eventInitDict);
     
     if (null != eventInitDict && 'gamepad' in eventInitDict) {
-      if (true || eventInitDict.gamepad instanceof Gamepad) Object.defineProperty(eventBase, 'gamepad',
+      if (DEBUG || eventInitDict.gamepad instanceof Gamepad) Object.defineProperty(eventBase, 'gamepad',
       { writable: false
       , enumerable: true
       , configurable: true
