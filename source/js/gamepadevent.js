@@ -85,11 +85,13 @@ define(['gamepad'], function (Gamepad) {
     var newGamepad = Object.create(Gamepad.prototype);
   
     window.dispatchEvent(new GamepadEvent("gamepadconnected", { gamepad: gamepad }));
-  }
+  };
   
   GamepadEvent._disconnect = function (gamepad, id, axes, buttons) {
     var newGamepad = Object.create(Gamepad.prototype);
   
     window.dispatchEvent(new GamepadEvent("gamepaddisconnected", { gamepad: gamepad }));
-  }
+  };
+  
+  return GamepadEvent;
 });

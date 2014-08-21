@@ -12,6 +12,8 @@ define(function () {
   , enumerable: false
   , configurable: false
   });
+  
+  return Gamepad;
 });
 
 /*
