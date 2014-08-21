@@ -33,6 +33,6 @@ define(['flash', 'gamepad', 'gamepadbutton', 'gamepadevent'], function (flash, G
     if (objToString.call(this) !== '[object Navigator]') throw new TypeError('Illegal invocation');
     //function getGamepads() { [native code] }
     
-    return flash.getGamepads(this);
+    return flash.getGamepads();
   };
 });
