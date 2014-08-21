@@ -2,8 +2,16 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title> &ndash; GamepadsOut</title>
+	<title> &ndash; GamepadIn</title>
 	<script>
+	window.addEventListener('gamepadconnected', function (event) {
+		console.log(event);
+	});
+	
+	window.addEventListener('gamepaddisconnected', function (event) {
+		console.log(event);
+	});
+	
 	(function (a) {
 		a = document.createElement('script');
 		a.src = 'source/js/require.js?_=' + Date.now();

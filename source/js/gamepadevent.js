@@ -5,9 +5,11 @@ define(['gamepad'], function (Gamepad) {
   var supportsProto = '__proto__' in {};
   var canChangePrototype = supportsSetPrototypeOf || supportsProto;
   
-  // is a plain Event better or should we base it on CustomEvent instead?
+  // is a plain Event better, or should we base it on CustomEvent instead?
   function GamepadEvent(type, eventInitDict) {
     if (!arguments.length) throw new TypeError("Failed to construct 'GamepadEvent': An event name must be provided.");
+    // TODO: add more robust check that it is indeed called using the new operator
+    if (!(this instanceof GamepadEvent)) throw new TypeError("Failed to construct 'GamepadEvent': Please use the 'new' operator, this DOM object constructor cannot be called as a function.");
     
     var eventBase = new Event(type, eventInitDict);
     
@@ -18,7 +20,7 @@ define(['gamepad'], function (Gamepad) {
       , configurable: true
       , value: eventInitDict.gamepad
       });
-      //else throw new TypeError("Failed to construct 'GamepadEvent': The 'gamepad' property does not have a Gamepad type.");
+      else throw new TypeError("Failed to construct 'GamepadEvent': The 'gamepad' property does not have a Gamepad type.");
     }
     
     // not very important, all it does is make constructor the correct property and toString generate the correct value

@@ -20,6 +20,7 @@ package {
     private function addDevice(device:GameInputDevice):void {
       device.enabled = true;
     
+      // object reference only changes when one of the values are supposed to change
       var axes:Array = [];
       var buttons:Array = [];
       
@@ -30,19 +31,22 @@ package {
         var minValue:Number = control.minValue;
         var maxValue:Number = control.maxValue;
         
-        if (control.id.slice(0, 4) === 'AXIS') {          
-          // normalise axis value to range [-1, 1]
+        if (/^AXIS/.test(control.id)) {          
+          // normalise axis value to range [-1, 1] (is this necessary?)
           if (minValue === -1 && maxValue === 1) axes.push(value);
           else axes.push((control.value - control.minValue) / (control.maxValue - control.minValue) * 2 - 1);
-        } else {
-          // normalise button value to range [0, 1]
-          var buttonValue:Number = minValue === 0 && maxValue === 1
-                                 ? value
-                                 : (control.value - control.minValue) / (control.maxValue - control.minValue);
+        } else if (/^BUTTON/.test(control.id)) {
+          var button:Object;
           
-         // TODO: check threshold value is accurate
-          var button:Object = { pressed: buttonValue > 0.9, value: buttonValue };
+          // AFAIK, controls listed as button are not pressure sensitive (0/1)
+          if (minValue !== 0 || maxValue !== 1) throw new RangeError('GameInput button range not set to [0, 1]');
+          if (value === 1) button = { pressed: true, value: 1 };
+          else if (value === 0) button = { pressed: false, value: 0 };
+          else throw new RangeError('GameInput button value not 0 or 1');
+          
           buttons.push(button);
+        } else {
+          throw new TypeError('Unexpected GameInput control type: ' + control.id);
         }
       }
       
