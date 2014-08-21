@@ -61,13 +61,33 @@ pub extern fn NP_GetPluginVersion() -> *mut c_char {
 #[cfg(target_os="macos")]
 pub extern "system" fn NP_GetEntryPoints(pFuncs: *mut NPPluginFuncs) -> NPError {}
 
+fn init(bFuncs: *mut NPNetscapeFuncs) -> ??? {
+  
+}
+
+#[no_mangle]
+#[cfg(win32)]
+#[cfg(target_os="macos")]
+pub extern "system" fn NP_Initialize(bFuncs: *mut NPNetscapeFuncs) -> NPError {
+  return init(bFuncs);
+}
+
+#[no_mangle]
+#[cfg(not(win32,target_os="macos")]
+pub extern "system" fn NP_Initialize(bFuncs: *mut NPNetscapeFuncs, pFuncs: *mut NPPluginFuncs) -> NPError {
+  NP_GetEntryPoints(pFuncs);
+  init(bFuncs);
+}
+
+
+
+
+  
 // the second argument is not passed on OSX and Windows (that's for NP_GetEntryPoints instead)
 #[no_mangle]
 pub extern "system" fn NP_Initialize(bFuncs: *mut NPNetscapeFuncs, pFuncs_opt: Option<*mut NPPluginFuncs>) -> NPError {
-  match pFuncs_opt {
-    Some(pFuncs) => return,
-    None => return
-  }
+  init(bFuncs);
+  
 }
 
 

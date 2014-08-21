@@ -1,0 +1,8 @@
+IE6: 10.3.183.16 (latest 10.3.183.90 may work, but not tested)
+IE7: 11.9.900.170 (ESR 11.7.700.279)
+IE8: current (14.0.0.145)
+
+Linux: ESR 11.2.202.394
+Solaris x86/Sparc: 11.2.202.223
+
+Minimum version for GameInput: 11.8

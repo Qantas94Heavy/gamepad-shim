@@ -1,0 +1,39 @@
+Gamepad support:
+
+Firefox: 29 (24-28 dom.gamepad.enabled, 24-27 require moz prefix)
+Pale Moon 24 = Firefox 24 (current ESR version, will become 31 from October 14, 2014)
+
+Chrome: 25 (21 navigator.webkitGamepads, 22-24 navigator.webkitGetGamepads
+Opera 15 = Chromium 28 (Opera 12 NO SUPPORT: latest on Linux, Opera 13/14 do not exist)
+
+Safari: NO
+IE: NO
+Konqueror: NO
+
+
+Alternatives:
+
+Flash: Opera 12 Win/Mac, Safari 6+, IE9+, FF24 ESR
+ActiveX: IE9+
+NPAPI: Opera 12, Safari 6+, FF24 ESR
+
+N.B.: Flash GameInput not supported on Linux (except PPAPI Flash)
+
+A lot of work for NPAPI plugin just for Opera 12 on Linux if we decide on Flash
+
+Need to investigate compatibility/capabilities of Gamepad API and Flash GameInput
+
+ActiveX may be able to be integrated into NPAPI DLL, but needs to be investigated
+
+NPAPI cross-platform and cross-browser support also need to be investigated
+
+
+Flash:
+
++ Multiple platforms easily targeted without being OS or browser specific
++ Language easier to learn than C/C++ or Rust
++ Vast majority of users have Flash on their computer (no need to install another program)
+- GameInput not supported on Linux (except for PPAPI browsers)
+- Have to learn a new language (Haxe/AS3)
+
+
