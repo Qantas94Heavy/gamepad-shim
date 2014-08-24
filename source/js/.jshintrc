@@ -3,6 +3,7 @@
   , "Navigator": false
   , "require": false
 	, "define": false
+  , "DEBUG": true
   }
 , "laxcomma": true
 , "laxbreak": true

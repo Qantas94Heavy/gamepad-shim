@@ -3,6 +3,13 @@
 // See the COPYRIGHT.md file at the top-level directory of this
 // distribution, or go to http://www.gnu.org/licenses/.
 
+/* List of things that contian unions:
+ * NPPrint
+ * NPAsyncSurface
+ * NPCocoaEvent
+ * NPVariant
+ */
+
 #![allow(non_camel_case_types)]
 
 extern crate libc;
@@ -118,9 +125,8 @@ struct NPPrint {
  * as Microsoft's COM ABI will likely not change.
  */
 
-/* gcc 3.x generated vtables on UNIX and OSX are incompatible with
- * previous compilers.
- */
+// gcc 3.x generated vtables on UNIX and OSX are incompatible with previous compilers.
+// is this even necessary with Rust?
 #[cfg(unix)]
 static _NP_ABI_MIXIN_FOR_GCC3: int = 0x10000000;
 #[cfg(not(unix))]

@@ -7,7 +7,7 @@ Chrome: 25 (21 navigator.webkitGamepads, 22-24 navigator.webkitGetGamepads
 Opera 15 = Chromium 28 (Opera 12 NO SUPPORT: latest on Linux, Opera 13/14 do not exist)
 
 Safari: NO
-IE: NO
+IE: NO (rumoured for IE12)
 Konqueror: NO
 
 
@@ -28,12 +28,11 @@ ActiveX may be able to be integrated into NPAPI DLL, but needs to be investigate
 NPAPI cross-platform and cross-browser support also need to be investigated
 
 
-Flash:
+Flash vs NPAPI:
 
 + Multiple platforms easily targeted without being OS or browser specific
 + Language easier to learn than C/C++ or Rust
 + Vast majority of users have Flash on their computer (no need to install another program)
 - GameInput not supported on Linux (except for PPAPI browsers)
 - Have to learn a new language (Haxe/AS3)
-
-
+- GameInput has numerous bugs in its implementation, most of which cannot be worked around
