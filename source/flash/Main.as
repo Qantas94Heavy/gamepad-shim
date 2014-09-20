@@ -27,9 +27,6 @@ package {
       for (var i:int = 0; i < device.numControls; ++i) {
         var control:GameInputControl = device.getControlAt(i);
         
-        var a:GameInputControlName = new GameInputControlName();
-        a.
-        
         var value:Number = control.value;
         var minValue:Number = control.minValue;
         var maxValue:Number = control.maxValue;

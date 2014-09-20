@@ -7,14 +7,16 @@ define(['gamepad'], function (Gamepad) {
   
   // is a plain Event better, or should we base it on CustomEvent instead?
   function GamepadEvent(type, eventInitDict) {
-    if (!arguments.length) throw new TypeError("Failed to construct 'GamepadEvent': An event name must be provided.");
     // TODO: add more robust check that it is indeed called using the new operator
     if (!(this instanceof GamepadEvent)) throw new TypeError("Failed to construct 'GamepadEvent': Please use the 'new' operator, this DOM object constructor cannot be called as a function.");
+    
+    if (!arguments.length) throw new TypeError("Failed to construct 'GamepadEvent': An event name must be provided.");
+    
     
     var eventBase = new Event(type, eventInitDict);
     
     if (null != eventInitDict && 'gamepad' in eventInitDict) {
-      if (DEBUG || eventInitDict.gamepad instanceof Gamepad) Object.defineProperty(eventBase, 'gamepad',
+      if (eventInitDict.gamepad instanceof Gamepad) Object.defineProperty(eventBase, 'gamepad',
       { writable: false
       , enumerable: true
       , configurable: true
@@ -41,6 +43,8 @@ define(['gamepad'], function (Gamepad) {
       , value: toString
       }
     });
+    
+    return eventBase;
   }
   
   function toString() {
@@ -82,17 +86,33 @@ define(['gamepad'], function (Gamepad) {
   , value: GamepadEventPrototype
   });
   
-  // let's just add our own dispatch event sugar here
-  GamepadEvent._connect = function (gamepad, id, axes, buttons) {
-    var newGamepad = Object.create(Gamepad.prototype);
+  // Internal stuff, please don't use this in application code
+  GamepadEvent._connect = function (options) {
+    console.log(1);
+    
+    var gamepad = Object.create(Gamepad.prototype);
+    gamepad.id = options.id;
+    gamepad.axes = options.axes;
+    gamepad.buttons = options.buttons;
+    gamepad.connected = options.connected;
+    gamepad.index = options.index;
+    gamepad.mapping = options.mapping;
   
-    window.dispatchEvent(new GamepadEvent("gamepadconnected", { gamepad: gamepad }));
+    window.dispatchEvent(new GamepadEvent('gamepadconnected', { gamepad: gamepad }));
   };
   
-  GamepadEvent._disconnect = function (gamepad, id, axes, buttons) {
-    var newGamepad = Object.create(Gamepad.prototype);
+  GamepadEvent._disconnect = function (options) {
+    console.log(2);
+    
+    var gamepad = Object.create(Gamepad.prototype);
+    gamepad.id = options.id;
+    gamepad.axes = options.axes;
+    gamepad.buttons = options.buttons;
+    gamepad.connected = options.connected;
+    gamepad.index = options.index;
+    gamepad.mapping = options.mapping;
   
-    window.dispatchEvent(new GamepadEvent("gamepaddisconnected", { gamepad: gamepad }));
+    window.dispatchEvent(new GamepadEvent('gamepaddisconnected', { gamepad: gamepad }));
   };
   
   return GamepadEvent;

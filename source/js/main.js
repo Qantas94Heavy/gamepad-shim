@@ -33,6 +33,22 @@ define(['flash', 'gamepad', 'gamepadbutton', 'gamepadevent'], function (flash, G
     if (objToString.call(this) !== '[object Navigator]') throw new TypeError('Illegal invocation');
     //function getGamepads() { [native code] }
     
-    return flash.getGamepads();
+    var gamepads = flash.getGamepads();
+    
+    for (var i = 0; i < gamepads.length; ++i) {
+      var oldGamepad = gamepads[i];
+      var newGamepad = Object.create(Gamepad.prototype);
+      
+      newGamepad.id = oldGamepad.id;
+      newGamepad.axes = oldGamepad.axes;
+      newGamepad.buttons = oldGamepad.buttons;
+      newGamepad.connected = oldGamepad.connected;
+      newGamepad.index = oldGamepad.index;
+      newGamepad.mapping = oldGamepad.mapping;
+      
+      gamepads[i] = newGamepad;
+    }
+    
+    return gamepads;
   };
 });

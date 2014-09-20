@@ -14,8 +14,8 @@
 	
 	(function (a) {
 		a = document.createElement('script');
-		a.src = 'source/js/require.js?_=' + Date.now();
-		a.setAttribute('data-main', 'source/js/main.js');
+		a.src = 'source/js/require.js';
+		a.setAttribute('data-main', 'source/js/main.js?_=' + Date.now());
 		document.head.appendChild(a);
 	})();
 	</script>
