@@ -30,15 +30,19 @@ define(['flash', 'gamepad', 'gamepadbutton', 'gamepadevent'], function (flash, G
   var objToString = {}.toString;
   
   Navigator.prototype.getGamepads = function getGamepads() {
-    if (objToString.call(this) !== '[object Navigator]') throw new TypeError('Illegal invocation');
     //function getGamepads() { [native code] }
+    if (objToString.call(this) !== '[object Navigator]') throw new TypeError('Illegal invocation');
     
     var gamepads = flash.getGamepads();
     
     for (var i = 0; i < gamepads.length; ++i) {
       var oldGamepad = gamepads[i];
-      var newGamepad = Object.create(Gamepad.prototype);
+      if (oldGamepad === null) {
+        delete gamepads[i];
+        continue;
+      }
       
+      var newGamepad = Object.create(Gamepad.prototype);
       newGamepad.id = oldGamepad.id;
       newGamepad.axes = oldGamepad.axes;
       newGamepad.buttons = oldGamepad.buttons;
