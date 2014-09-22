@@ -2,7 +2,10 @@
 
 if (typeof DEBUG === 'undefined') window.DEBUG = true;
 
-require.config({ urlArgs: "_=" + Date.now() });
+require.config({
+  urlArgs: DEBUG ? '_=' + Date.now() : '',
+  baseUrl: '/gamepad-shim/source/js'
+});
 
 define(['flash', 'gamepad', 'gamepadbutton', 'gamepadevent'], function (flash, Gamepad, GamepadButton, GamepadEvent) {
   // we don't actually do anything with these
