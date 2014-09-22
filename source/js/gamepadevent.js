@@ -12,9 +12,7 @@ define(['gamepad'], function (Gamepad) {
     
     if (!arguments.length) throw new TypeError("Failed to construct 'GamepadEvent': An event name must be provided.");
     
-    
     var eventBase = new Event(type, eventInitDict);
-    
     if (null != eventInitDict && 'gamepad' in eventInitDict) {
       if (eventInitDict.gamepad instanceof Gamepad) Object.defineProperty(eventBase, 'gamepad',
       { writable: false

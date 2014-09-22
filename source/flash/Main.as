@@ -31,7 +31,6 @@ package {
       }
       
       var gamepadControl:Array = gamepads[i].flashToGamepadControl[control];
-      ExternalInterface.call("console.log", gamepadControl);
       gamepadControl[0][gamepadControl[1]] = control.value;
     }
     
