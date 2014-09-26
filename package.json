@@ -1,0 +1,7 @@
+{ "name": "gamepad-shim"
+, "version": "0.0.1"
+, "description": "An HTML5 Gamepad API shim that uses vendor prefixes and a Flash fallback."
+, "author": "Karl Cheng (http://qantas94heavy.github.io)"
+, "bugs": "https://github.com/Qantas94Heavy/gamepad-shim/issues"
+, "jam": { "main": "js/main.js" }
+}
