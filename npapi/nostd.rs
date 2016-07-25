@@ -16,11 +16,6 @@
 /* but we can't use them in a dynamic library.                                                    */
 /**************************************************************************************************/
 
-#![feature(lang_items)]
-
-extern crate core;
-use core::intrinsics::abort;
-
 #[lang="stack_exhausted"]
 extern fn stack_exhausted() {}
 
@@ -31,9 +26,9 @@ extern fn eh_personality() {}
 // this crate's definition of failure 
 // must be defined by consumers of libcore (core library declares failure, but doesn't define it)
 // must be guaranteed to never return
-#[lang="begin_unwind"]
-extern fn begin_unwind(_args: &core::fmt::Arguments, _file: &str, _line: uint) -> ! {
+#[lang="panic_fmt"]
+fn panic_fmt() -> ! {
   // is it really good for an NPAPI library to be doing this?
   // not sure what is the correct way of doing this
-  loop {}
+   loop {}
 }

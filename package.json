@@ -3,5 +3,6 @@
 , "description": "An HTML5 Gamepad API shim that uses vendor prefixes and a Flash fallback."
 , "author": "Karl Cheng (http://qantas94heavy.github.io)"
 , "bugs": "https://github.com/Qantas94Heavy/gamepad-shim/issues"
-, "jam": { "main": "js/main.js" }
+, "dependencies": { "robohydra": "^0.5.2" }
+, "scripts": { "test": "robohydra -I ./ -n -P testing" }
 }

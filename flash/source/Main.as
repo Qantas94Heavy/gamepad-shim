@@ -3,6 +3,7 @@ package {
   import flash.external.ExternalInterface;
   import flash.events.Event;
   import flash.utils.Dictionary;
+  import flash.utils.setInterval;
   
   import flash.ui.GameInput;
   import flash.ui.GameInputDevice;
@@ -13,7 +14,6 @@ package {
     private var gameInput:GameInput = new GameInput();
     
     private var gamepads:Array = [];
-    private var emptyElements:Array = [];
     
     private function getGamepads():Object {
       return gamepads.map(function (gamepad:Object, ..._):Object {
@@ -25,13 +25,13 @@ package {
     private function onControlChange(event:Event):void {
       var control:GameInputControl = event.target as GameInputControl;
       
-      var i:int = 0;
-      for (; i < gamepads.length; ++i) {
-        if (gamepads[i].device === control.device) break;
+      for (var i:int = 0; i < gamepads.length; ++i) {
+        if (gamepads[i].device === control.device) {
+          var gamepadControl:Array = gamepads[i].flashToGamepadControl[control];
+          gamepadControl[0][gamepadControl[1]] = control.value;
+          break;
+        }
       }
-      
-      var gamepadControl:Array = gamepads[i].flashToGamepadControl[control];
-      gamepadControl[0][gamepadControl[1]] = control.value;
     }
     
     private function addDevice(device:GameInputDevice):void {
@@ -41,6 +41,7 @@ package {
       var axes:Array = [];
       var buttons:Array = [];
       
+      // weak map
       var flashToGamepadControl:Dictionary = new Dictionary(true);
       
       for (var i:int = 0; i < device.numControls; ++i) {
@@ -53,24 +54,21 @@ package {
         
         if (/^AXIS/.test(control.id)) {          
           // normalise axis value to range [-1, 1] (is this necessary?)
+          // TODO: find way of doing this which has better floating point accuracy
           if (minValue === -1 && maxValue === 1) axes.push(value);
-          else axes.push((control.value - control.minValue) / (control.maxValue - control.minValue) * 2 - 1);
+          else axes.push((value - minValue) / (maxValue - minValue) * 2 - 1);
           
           flashToGamepadControl[control] = [axes, axes.length - 1];
         } else if (/^BUTTON/.test(control.id)) {
-          var button:Object;
+          // AFAIK all buttons are in range [0, 1]
+          if (minValue !== 0 || maxValue !== 1) {
+            throw new RangeError('GameInput button range not set to [0, 1]');
+          }
           
-          // AFAIK, controls listed as button are not pressure sensitive (0/1)
-          if (minValue !== 0 || maxValue !== 1) throw new RangeError('GameInput button range not set to [0, 1]');
-          if (value === 1) button = { pressed: true, value: 1 };
-          else if (value === 0) button = { pressed: false, value: 0 };
-          else throw new RangeError('GameInput button value not 0 or 1');
-          
-          buttons.push(button);
+          buttons.push(value);
           flashToGamepadControl[control] = [buttons, buttons.length - 1];
-        } else {
-          throw new TypeError('Unexpected GameInput control type: ' + control.id);
         }
+        else throw new TypeError('Unexpected GameInput control type: ' + control.id);
       }
       
       var w3c:Object = { id: device.id, axes: axes, buttons: buttons, connected: device.enabled, index: gamepads.length, mapping: '' };
@@ -85,20 +83,33 @@ package {
     
     private function onGamepadDisconnected(event:GameInputEvent):void {
       ExternalInterface.call('GamepadEvent._disconnect', event.device);
-      var i:int = 0;
-      for (; i < gamepads.length; ++i) {
-        if (gamepads[i].device === event.device) break;
-      }
       
-      gamepads[i] = null;
+      for (var i:int = 0; i < gamepads.length; ++i) {
+        if (gamepads[i].device === event.device) {
+          gamepads[i] = null;
+          break;
+        }
+      }
     }
     
     public function Main():void {
-      if (!GameInput.isSupported || !ExternalInterface.available) throw new TypeError('Flash GameInput is not supported on this platform');
+      if (!GameInput.isSupported) {
+        var error:String = 'Flash GameInput is not supported on this platform';
+        if (ExternalInterface.available) ExternalInterface.call('eval', 'throw new TypeError("' + error + '")');
+        throw new TypeError(error);
+      }
+      
       ExternalInterface.addCallback('getGamepads', getGamepads);
+      
+      flash.utils.setInterval(function ():void {
+        ExternalInterface.call('console.log', GameInput.numDevices);
+      }, 1000);
       
       gameInput.addEventListener(GameInputEvent.DEVICE_ADDED, onGamepadConnected);
       gameInput.addEventListener(GameInputEvent.DEVICE_REMOVED, onGamepadDisconnected);
+      gameInput.addEventListener(GameInputEvent.DEVICE_UNUSABLE, function (event:GameInputEvent):void {
+        ExternalInterface.call('console.warn', event);
+      });
       
       for (var i:int = 0; i < GameInput.numDevices; ++i) {
         addDevice(GameInput.getDeviceAt(i));

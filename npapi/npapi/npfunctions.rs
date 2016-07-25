@@ -1,30 +1,33 @@
 // &[*mut c_char]???
-type NPP_NewProcPtr = fn (pluginType: NPMIMEType, instance: NPP, mode: uint16_t,
-                          argc: int16_t, argn: *mut *mut c_char, argv: *mut *mut c_char,
+type NPP_NewProcPtr = fn (pluginType: NPMIMEType, instance: NPP, mode: u16,
+                          argc: i16, argn: *mut *mut c_char, argv: *mut *mut c_char,
                           saved: *mut NPSavedData) -> NPError;
 type NPP_DestroyProcPtr = fn (instance: NPP, save: *mut *mut NPSavedData) -> NPError;
 type NPP_SetWindowProcPtr = fn (instance: NPP, window: *mut NPWindow) -> NPError;
 type NPP_NewStreamProcPtr = fn (instance: NPP, mime_type: NPMIMEType, stream: *mut NPStream,
-                                seekable: NPBool, stype: *mut uint16_t) -> NPError;
+                                seekable: NPBool, stype: *mut u16) -> NPError;
 type NPP_DestroyStreamProcPtr = fn (instance: NPP, stream: *mut NPStream, reason: NPReason) -> NPError;
-type NPP_WriteReadyProcPtr = fn (instance: NPP, stream: *mut NPStream) -> int32_t;
-type NPP_WriteProcPtr = fn (instance: NPP, stream: *mut NPStream, offset: int32_t, len: int32_t, buffer: *mut c_void) -> int32_t;
+type NPP_WriteReadyProcPtr = fn (instance: NPP, stream: *mut NPStream) -> i32;
+type NPP_WriteProcPtr = fn (instance: NPP, stream: *mut NPStream, offset: i32, len: i32, buffer: *mut c_void) -> i32;
 type NPP_StreamAsFileProcPtr = fn (instance: NPP, stream: *mut NPStream, fname: *const c_char);
 type NPP_PrintProcPtr = fn (instance: NPP, platformPrint: *mut NPPrint);
-type NPP_HandleEventProcPtr = fn (instance: NPP, event: *mut c_void) -> int16_t;
+type NPP_HandleEventProcPtr = fn (instance: NPP, event: *mut c_void) -> i16;
 type NPP_URLNotifyProcPtr = fn (instance: NPP, url: *const c_char, reason: NPReason, notifyData: *mut c_void);
+
+// Any NPObjects returned to the browser via NPP_GetValue should be retained
+// by the plugin on the way out. The browser is responsible for releasing.
 type NPP_GetValueProcPtr = fn (instance: NPP, variable: NPPVariable, ret_value: *mut c_void) -> NPError;
 type NPP_SetValueProcPtr = fn (instance: NPP, variable: NPNVariable, value: *mut c_void) -> NPError;
 type NPP_GotFocusPtr = fn (instance: NPP, direction: NPFocusDirection) -> NPBool;
 type NPP_LostFocusPtr = fn (instance: NPP);
-type NPP_URLRedirectNotifyPtr = fn (instance: NPP, url: *const c_char, status: int32_t, notifyData: *mut c_void);
-type NPP_ClearSiteDataPtr = fn (site: *const c_char, flags: uint64_t, maxAge: uint64_t) -> NPError;
+type NPP_URLRedirectNotifyPtr = fn (instance: NPP, url: *const c_char, status: i32, notifyData: *mut c_void);
+type NPP_ClearSiteDataPtr = fn (site: *const c_char, flags: u64, maxAge: u64) -> NPError;
 type NPP_GetSitesWithDataPtr = fn () -> *mut *mut c_char;
 type NPP_DidCompositePtr = fn (instance: NPP);
 
 pub struct NPPluginFuncs {
-  size: uint16_t,
-  version: uint16_t,
+  size: u16,
+  version: u16,
   newp: NPP_NewProcPtr,
   destroy: NPP_DestroyProcPtr,
   setwindow: NPP_SetWindowProcPtr,
@@ -47,73 +50,74 @@ pub struct NPPluginFuncs {
   didComposite: NPP_DidCompositePtr
 }
 
-/*
-typedef NPError      (* NPN_GetValueProcPtr)(NPP instance, NPNVariable variable, void *ret_value);
-typedef NPError      (* NPN_SetValueProcPtr)(NPP instance, NPPVariable variable, void *value);
-typedef NPError      (* NPN_GetURLNotifyProcPtr)(NPP instance, const char* url, const char* window, void* notifyData);
-typedef NPError      (* NPN_PostURLNotifyProcPtr)(NPP instance, const char* url, const char* window, uint32_t len, const char* buf, NPBool file, void* notifyData);
-typedef NPError      (* NPN_GetURLProcPtr)(NPP instance, const char* url, const char* window);
-typedef NPError      (* NPN_PostURLProcPtr)(NPP instance, const char* url, const char* window, uint32_t len, const char* buf, NPBool file);
-typedef NPError      (* NPN_RequestReadProcPtr)(NPStream* stream, NPByteRange* rangeList);
-typedef NPError      (* NPN_NewStreamProcPtr)(NPP instance, NPMIMEType type, const char* window, NPStream** stream);
-typedef int32_t      (* NPN_WriteProcPtr)(NPP instance, NPStream* stream, int32_t len, void* buffer);
-typedef NPError      (* NPN_DestroyStreamProcPtr)(NPP instance, NPStream* stream, NPReason reason);
-typedef void         (* NPN_StatusProcPtr)(NPP instance, const char* message);
+// _NPNetscapeFuncs
+
+type NPN_GetValueProcPtr = fn (instance: NPP, variable: NPNVariable, ret_value: *mut c_void) -> NPError;
+type NPN_SetValueProcPtr = fn (instance: NPP, variable: NPPVariable, value: *mut c_void) -> NPError;
+type NPN_GetURLNotifyProcPtr = fn (instance: NPP, url: *const c_char, window: *const c_char, notifyData: *mut c_void) -> NPError;
+type NPN_PostURLNotifyProcPtr = fn (instance: NPP, url: *const c_char, window: *const c_char, len: u32, buf: *const c_char, file: NPBool, notifyData: *mut c_void) -> NPError;
+type NPN_GetURLProcPtr = fn (instance: NPP, url: *const c_char, window: *const c_char) -> NPError;
+type NPN_PostURLProcPtr = fn (instance: NPP, url: *const c_char, window: *const c_char, len: u32, buf: *const c_char, file: NPBool) -> NPError;
+type NPN_RequestReadProcPtr = fn (stream: *mut NPStream, rangeList: *mut NPByteRange) -> NPError;
+type NPN_NewStreamProcPtr = fn (instance: NPP, NPMIMEType type, window: *const c_char, stream: *mut *mut NPStream) -> NPError;
+type NPN_WriteProcPtr = fn (instance: NPP, NPStream* stream, len: i32, buffer: *mut c_void) -> i32;
+type NPN_DestroyStreamProcPtr = fn (instance: NPP, NPStream* stream, reason: NPReason) -> NPError;
+type NPN_StatusProcPtr = fn (instance: NPP, message: *const c_char);
 
 // Browser manages the lifetime of the buffer returned by NPN_UserAgent,
 // don't depend on it sticking around and don't free it.
-typedef const char*  (* NPN_UserAgentProcPtr)(NPP instance);
-typedef void*        (* NPN_MemAllocProcPtr)(uint32_t size);
-typedef void         (* NPN_MemFreeProcPtr)(void* ptr);
-typedef uint32_t     (* NPN_MemFlushProcPtr)(uint32_t size);
-typedef void         (* NPN_ReloadPluginsProcPtr)(NPBool reloadPages);
-typedef void*        (* NPN_GetJavaEnvProcPtr)(void);
-typedef void*        (* NPN_GetJavaPeerProcPtr)(NPP instance);
-typedef void         (* NPN_InvalidateRectProcPtr)(NPP instance, NPRect *rect);
-typedef void         (* NPN_InvalidateRegionProcPtr)(NPP instance, NPRegion region);
-typedef void         (* NPN_ForceRedrawProcPtr)(NPP instance);
-typedef NPIdentifier (* NPN_GetStringIdentifierProcPtr)(const NPUTF8* name);
-typedef void         (* NPN_GetStringIdentifiersProcPtr)(const NPUTF8** names, int32_t nameCount, NPIdentifier* identifiers);
-typedef NPIdentifier (* NPN_GetIntIdentifierProcPtr)(int32_t intid);
-typedef bool         (* NPN_IdentifierIsStringProcPtr)(NPIdentifier identifier);
-typedef NPUTF8*      (* NPN_UTF8FromIdentifierProcPtr)(NPIdentifier identifier);
-typedef int32_t      (* NPN_IntFromIdentifierProcPtr)(NPIdentifier identifier);
-typedef NPObject*    (* NPN_CreateObjectProcPtr)(NPP npp, NPClass *aClass);
-typedef NPObject*    (* NPN_RetainObjectProcPtr)(NPObject *obj);
-typedef void         (* NPN_ReleaseObjectProcPtr)(NPObject *obj);
-typedef bool         (* NPN_InvokeProcPtr)(NPP npp, NPObject* obj, NPIdentifier methodName, const NPVariant *args, uint32_t argCount, NPVariant *result);
-typedef bool         (* NPN_InvokeDefaultProcPtr)(NPP npp, NPObject* obj, const NPVariant *args, uint32_t argCount, NPVariant *result);
-typedef bool         (* NPN_EvaluateProcPtr)(NPP npp, NPObject *obj, NPString *script, NPVariant *result);
-typedef bool         (* NPN_GetPropertyProcPtr)(NPP npp, NPObject *obj, NPIdentifier propertyName, NPVariant *result);
-typedef bool         (* NPN_SetPropertyProcPtr)(NPP npp, NPObject *obj, NPIdentifier propertyName, const NPVariant *value);
-typedef bool         (* NPN_RemovePropertyProcPtr)(NPP npp, NPObject *obj, NPIdentifier propertyName);
-typedef bool         (* NPN_HasPropertyProcPtr)(NPP npp, NPObject *obj, NPIdentifier propertyName);
-typedef bool         (* NPN_HasMethodProcPtr)(NPP npp, NPObject *obj, NPIdentifier propertyName);
-typedef void         (* NPN_ReleaseVariantValueProcPtr)(NPVariant *variant);
-typedef void         (* NPN_SetExceptionProcPtr)(NPObject *obj, const NPUTF8 *message);
-typedef void         (* NPN_PushPopupsEnabledStateProcPtr)(NPP npp, NPBool enabled);
-typedef void         (* NPN_PopPopupsEnabledStateProcPtr)(NPP npp);
-typedef bool         (* NPN_EnumerateProcPtr)(NPP npp, NPObject *obj, NPIdentifier **identifier, uint32_t *count);
-typedef void         (* NPN_PluginThreadAsyncCallProcPtr)(NPP instance, void (*func)(void *), void *userData);
-typedef bool         (* NPN_ConstructProcPtr)(NPP npp, NPObject* obj, const NPVariant *args, uint32_t argCount, NPVariant *result);
-typedef NPError      (* NPN_GetValueForURLPtr)(NPP npp, NPNURLVariable variable, const char *url, char **value, uint32_t *len);
-typedef NPError      (* NPN_SetValueForURLPtr)(NPP npp, NPNURLVariable variable, const char *url, const char *value, uint32_t len);
-typedef NPError      (* NPN_GetAuthenticationInfoPtr)(NPP npp, const char *protocol, const char *host, int32_t port, const char *scheme, const char *realm, char **username, uint32_t *ulen, char **password, uint32_t *plen);
-typedef uint32_t     (* NPN_ScheduleTimerPtr)(NPP instance, uint32_t interval, NPBool repeat, void (*timerFunc)(NPP npp, uint32_t timerID));
-typedef void         (* NPN_UnscheduleTimerPtr)(NPP instance, uint32_t timerID);
-typedef NPError      (* NPN_PopUpContextMenuPtr)(NPP instance, NPMenu* menu);
-typedef NPBool       (* NPN_ConvertPointPtr)(NPP instance, double sourceX, double sourceY, NPCoordinateSpace sourceSpace, double *destX, double *destY, NPCoordinateSpace destSpace);
-typedef NPBool       (* NPN_HandleEventPtr)(NPP instance, void *event, NPBool handled);
-typedef NPBool       (* NPN_UnfocusInstancePtr)(NPP instance, NPFocusDirection direction);
-typedef void         (* NPN_URLRedirectResponsePtr)(NPP instance, void* notifyData, NPBool allow);
-typedef NPError      (* NPN_InitAsyncSurfacePtr)(NPP instance, NPSize *size, NPImageFormat format, void *initData, NPAsyncSurface *surface);
-typedef NPError      (* NPN_FinalizeAsyncSurfacePtr)(NPP instance, NPAsyncSurface *surface);
-typedef void         (* NPN_SetCurrentAsyncSurfacePtr)(NPP instance, NPAsyncSurface *surface, NPRect *changed);
-*/
+type NPN_UserAgentProcPtr = fn (instance: NPP) -> *const c_char;
+type NPN_MemAllocProcPtr = fn (size: u32) -> *mut c_void;
+type NPN_MemFreeProcPtr = fn (ptr: *mut c_void);
+type NPN_MemFlushProcPtr = fn (size: u32) -> u32;
+type NPN_ReloadPluginsProcPtr = fn (reloadPages: NPBool);
+type NPN_GetJavaEnvProcPtr = fn () -> *mut c_void;
+type NPN_GetJavaPeerProcPtr = fn (instance: NPP) -> *mut c_void;
+type NPN_InvalidateRectProcPtr = fn (instance: NPP, rect: *mut NPRect);
+type NPN_InvalidateRegionProcPtr = fn (instance: NPP, region: NPRegion);
+type NPN_ForceRedrawProcPtr = fn (instance: NPP);
+type NPN_GetStringIdentifierProcPtr = fn (name: *const NPUTF8) -> NPIdentifier;
+type NPN_GetStringIdentifiersProcPtr = fn (names: *const *const NPUTF8, nameCount: i32, identifiers: *mut NPIdentifier);
+type NPN_GetIntIdentifierProcPtr = fn (intid: i32) -> NPIdentifier;
+type NPN_IdentifierIsStringProcPtr = fn (identifier: NPIdentifier) -> c_bool;
+type NPN_UTF8FromIdentifierProcPtr = fn (identifier: NPIdentifier) -> *mut NPUTF8;
+type NPN_IntFromIdentifierProcPtr = fn (identifier: NPIdentifier) -> i32;
+type NPN_CreateObjectProcPtr = fn (npp: NPP, aClass: *mut NPClass) -> *mut NPObject;
+type NPN_RetainObjectProcPtr = fn (obj: *mut NPObject) -> *mut NPObject;
+type NPN_ReleaseObjectProcPtr = fn (obj: *mut NPObject);
+
+type NPN_InvokeProcPtr = fn (npp: NPP, obj: *mut NPObject, methodName: NPIdentifier, args: *const NPVariant, argCount: u32, result: *mut NPVariant) -> c_bool;
+type NPN_InvokeDefaultProcPtr = fn (npp: NPP, obj: *mut NPObject, args: *const NPVariant, argCount: u32, result: *mut NPVariant) -> c_bool;
+type NPN_EvaluateProcPtr = fn (npp: NPP, obj: *mut NPObject, NPString *script, result: *mut NPVariant) -> c_bool;
+type NPN_GetPropertyProcPtr = fn (npp: NPP, obj: *mut NPObject, propertyName: NPIdentifier, result: *mut NPVariant) -> c_bool;
+type NPN_SetPropertyProcPtr = fn (npp: NPP, obj: *mut NPObject, propertyName: NPIdentifier, value: *const NPVariant) -> c_bool;
+type NPN_RemovePropertyProcPtr = fn (npp: NPP, obj: *mut NPObject, propertyName: NPIdentifier) -> c_bool;
+type NPN_HasPropertyProcPtr = fn (npp: NPP, obj: *mut NPObject, propertyName: NPIdentifier) -> c_bool;
+type NPN_HasMethodProcPtr = fn (npp: NPP, obj: *mut NPObject, propertyName: NPIdentifier) -> c_bool;
+type NPN_ReleaseVariantValueProcPtr = fn (variant: *mut NPVariant);
+type NPN_SetExceptionProcPtr = fn (obj: *mut NPObject, message: *const NPUTF8);
+type NPN_PushPopupsEnabledStateProcPtr = fn (npp: NPP, enabled: NPBool);
+type NPN_PopPopupsEnabledStateProcPtr = fn (npp: NPP);
+type NPN_EnumerateProcPtr = fn (npp: NPP, obj: *mut NPObject, identifier: *mut *mut NPIdentifier, count: *mut u32) -> c_bool;
+type NPN_PluginThreadAsyncCallProcPtr = fn (instance: NPP, func: fn (*mut c_void), userData: *mut c_void);
+type NPN_ConstructProcPtr = fn (npp: NPP, obj: *mut NPObject, args: *const NPVariant, argCount: u32, result: *mut NPVariant) -> c_bool;
+type NPN_GetValueForURLPtr = fn (npp: NPP, variable: NPNURLVariable, url: *const c_char, value: *mut *mut c_char, u32 *len) -> NPError;
+type NPN_SetValueForURLPtr = fn (npp: NPP, variable: NPNURLVariable, url: *const c_char, value: *const c_char, len: u32) -> NPError;
+type NPN_GetAuthenticationInfoPtr = fn (npp: NPP, protocol: *const c_char, host: *const c_char, port: i32, scheme: *const c_char, realm: *const c_char, username: *mut *mut c_char, ulen: *mut u32, password: *mut *mut c_char, plen: *mut u32) -> NPError;
+type NPN_ScheduleTimerPtr = fn (instance: NPP, interval: u32, repeat: NPBool, timerFunc: fn (npp: NPP, timerID: u32)) -> u32;
+type NPN_UnscheduleTimerPtr = fn (instance: NPP, timerID: u32);
+type NPN_PopUpContextMenuPtr = fn (instance: NPP, NPMenu* menu) -> NPError;
+type NPN_ConvertPointPtr = fn (instance: NPP, sourceX: c_double, sourceY: c_double, sourceSpace: NPCoordinateSpace, destX: *mut c_double, destY: *mut c_double, destSpace: NPCoordinateSpace) -> NPBool;
+type NPN_HandleEventPtr = fn (instance: NPP, event: *mut c_void, handled: NPBool) -> NPBool;
+type NPN_UnfocusInstancePtr = fn (instance: NPP, direction: NPFocusDirection) -> NPBool;
+type NPN_URLRedirectResponsePtr = fn (instance: NPP, notifyData: *mut c_void, allow: NPBool);
+type NPN_InitAsyncSurfacePtr = fn (instance: NPP, NPSize *size, format: NPImageFormat, initData: *mut c_void, surface: *mut NPAsyncSurface) -> NPError;
+type NPN_FinalizeAsyncSurfacePtr = fn (instance: NPP, surface: *mut NPAsyncSurface) -> NPError;
+type NPN_SetCurrentAsyncSurfacePtr = fn (instance: NPP, surface: *mut NPAsyncSurface, changed: *mut NPRect);
 
 pub struct NPNetscapeFuncs {
-  size: uint16_t,
-  version: uint16_t,
+  size: u16,
+  version: u16,
   geturl: NPN_GetURLProcPtr,
   posturl: NPN_PostURLProcPtr,
   requestread: NPN_RequestReadProcPtr,

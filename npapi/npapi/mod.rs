@@ -11,13 +11,17 @@
  */
 
 #![allow(non_camel_case_types)]
+#![feature(globs)]
 
 extern crate libc;
-use libc::{int16_t, uint16_t, int32_t, uint32_t, uint64_t, c_char, c_uchar, c_void};
+extern crate core;
+
+use libc::{c_char, c_uchar, c_void};
+use core::prelude::*;
   
 pub type NPBool = c_uchar;
-pub type NPError = int16_t;
-pub type NPReason = int16_t;
+pub type NPError = i16;
+pub type NPReason = i16;
 pub type NPMIMEType = *mut c_char;
 
 struct NPP_t {
@@ -30,8 +34,8 @@ struct NPStream {
   pdata: *mut c_void, // plug-in private data
   ndata: *mut c_void, // Netscape private data
   url: *const c_char,
-  end: uint32_t,
-  lastmodified: uint32_t,
+  end: u32,
+  lastmodified: u32,
   notifyData: *mut c_void,
   
   // Response headers from host. Exists only for >= NPVERS_HAS_RESPONSE_HEADERS.
@@ -39,19 +43,19 @@ struct NPStream {
   // Plugin should copy this data before storing it. Includes HTTP status line and all headers,
   // preferably verbatim as received from server, headers formatted as in HTTP ("Header: Value"),
   // and newlines (\n, NOT \r\n) separating lines. Terminated by \n\0 (NOT \n\n\0).
-  headers: *const c_char 
+  headers: *const c_char
 }
 
 struct NPSavedData {
-  len: int32_t,
+  len: i32,
   buf: *mut c_void
 }
 
 struct NPRect {
-  top: uint16_t,
-  left: uint16_t,
-  bottom: uint16_t,
-  right: uint16_t
+  top: u16,
+  left: u16,
+  bottom: u16,
+  right: u16
 }
 
 enum NPFocusDirection {
@@ -70,10 +74,10 @@ enum NPWindowType {
 
 struct NPWindow {
   window: *mut c_void, // platform-specific window handle
-  x: int32_t, // position of top left corner relative to a Netscape page.
-  y: int32_t,
-  width: uint32_t, // maximum window size
-  height: uint32_t,
+  x: i32, // position of top left corner relative to a Netscape page.
+  y: i32,
+  width: u32, // maximum window size
+  height: u32,
   clipRect: NPRect, // clipping rectangle in port coordinates
   #[cfg(target_os="linux")] #[cfg(target_os="freebsd")]
   ws_info: *mut c_void, // platform-dependent additional data (Unix-only)
@@ -109,7 +113,7 @@ enum Print {
 */
 
 struct NPPrint {
-  mode: uint16_t, // NP_FULL or NP_EMBED
+  mode: u16, // NP_FULL or NP_EMBED
   print: Print
 }
 
@@ -126,7 +130,7 @@ struct NPPrint {
  */
 
 // gcc 3.x generated vtables on UNIX and OSX are incompatible with previous compilers.
-// is this even necessary with Rust?
+// TODO: is this even necessary with Rust?
 #[cfg(unix)]
 static _NP_ABI_MIXIN_FOR_GCC3: int = 0x10000000;
 #[cfg(not(unix))]
@@ -266,3 +270,101 @@ enum NPNVariable {
   #[cfg(target_os="macos")]
   NPNVsupportsCompositingCoreAnimationPluginsBool = 74656
 }
+
+
+/*
+NPError NPP_New(NPMIMEType pluginType, NPP instance,
+                          uint16_t mode, int16_t argc, char* argn[],
+                          char* argv[], NPSavedData* saved);
+NPError NPP_Destroy(NPP instance, NPSavedData** save);
+NPError NPP_SetWindow(NPP instance, NPWindow* window);
+NPError NPP_NewStream(NPP instance, NPMIMEType type,
+                                NPStream* stream, NPBool seekable,
+                                uint16_t* stype);
+NPError NPP_DestroyStream(NPP instance, NPStream* stream,
+                                    NPReason reason);
+int32_t NPP_WriteReady(NPP instance, NPStream* stream);
+int32_t NPP_Write(NPP instance, NPStream* stream, int32_t offset,
+                            int32_t len, void* buffer);
+void    NPP_StreamAsFile(NPP instance, NPStream* stream,
+                                   const char* fname);
+void    NPP_Print(NPP instance, NPPrint* platformPrint);
+int16_t NPP_HandleEvent(NPP instance, void* event);
+void    NPP_URLNotify(NPP instance, const char* url,
+                                NPReason reason, void* notifyData);
+NPError NPP_GetValue(NPP instance, NPPVariable variable, void *value);
+NPError NPP_SetValue(NPP instance, NPNVariable variable, void *value);
+NPBool  NPP_GotFocus(NPP instance, NPFocusDirection direction);
+void    NPP_LostFocus(NPP instance);
+void    NPP_URLRedirectNotify(NPP instance, const char* url, int32_t status, void* notifyData);
+NPError NPP_ClearSiteData(const char* site, uint64_t flags, uint64_t maxAge);
+char**  NPP_GetSitesWithData(void);
+void    NPP_DidComposite(NPP instance);
+
+/* NPN_* functions are provided by the navigator and called by the plugin. */
+void        NPN_Version(int* plugin_major, int* plugin_minor,
+                                  int* netscape_major, int* netscape_minor);
+NPError     NPN_GetURLNotify(NPP instance, const char* url,
+                                       const char* target, void* notifyData);
+NPError     NPN_GetURL(NPP instance, const char* url,
+                                 const char* target);
+NPError     NPN_PostURLNotify(NPP instance, const char* url,
+                                        const char* target, uint32_t len,
+                                        const char* buf, NPBool file,
+                                        void* notifyData);
+NPError     NPN_PostURL(NPP instance, const char* url,
+                                  const char* target, uint32_t len,
+                                  const char* buf, NPBool file);
+NPError     NPN_RequestRead(NPStream* stream, NPByteRange* rangeList);
+NPError     NPN_NewStream(NPP instance, NPMIMEType type,
+                                    const char* target, NPStream** stream);
+int32_t     NPN_Write(NPP instance, NPStream* stream, int32_t len,
+                                void* buffer);
+NPError     NPN_DestroyStream(NPP instance, NPStream* stream,
+                                        NPReason reason);
+void        NPN_Status(NPP instance, const char* message);
+const char* NPN_UserAgent(NPP instance);
+void*       NPN_MemAlloc(uint32_t size);
+void        NPN_MemFree(void* ptr);
+uint32_t    NPN_MemFlush(uint32_t size);
+void        NPN_ReloadPlugins(NPBool reloadPages);
+NPError     NPN_GetValue(NPP instance, NPNVariable variable,
+                                   void *value);
+NPError     NPN_SetValue(NPP instance, NPPVariable variable,
+                                   void *value);
+void        NPN_InvalidateRect(NPP instance, NPRect *invalidRect);
+void        NPN_InvalidateRegion(NPP instance,
+                                           NPRegion invalidRegion);
+void        NPN_ForceRedraw(NPP instance);
+void        NPN_PushPopupsEnabledState(NPP instance, NPBool enabled);
+void        NPN_PopPopupsEnabledState(NPP instance);
+void        NPN_PluginThreadAsyncCall(NPP instance,
+                                                void (*func) (void *),
+                                                void *userData);
+NPError     NPN_GetValueForURL(NPP instance, NPNURLVariable variable,
+                                         const char *url, char **value,
+                                         uint32_t *len);
+NPError     NPN_SetValueForURL(NPP instance, NPNURLVariable variable,
+                                         const char *url, const char *value,
+                                         uint32_t len);
+NPError     NPN_GetAuthenticationInfo(NPP instance,
+                                                const char *protocol,
+                                                const char *host, int32_t port,
+                                                const char *scheme,
+                                                const char *realm,
+                                                char **username, uint32_t *ulen,
+                                                char **password,
+                                                uint32_t *plen);
+uint32_t    NPN_ScheduleTimer(NPP instance, uint32_t interval, NPBool repeat, void (*timerFunc)(NPP npp, uint32_t timerID));
+void        NPN_UnscheduleTimer(NPP instance, uint32_t timerID);
+NPError     NPN_PopUpContextMenu(NPP instance, NPMenu* menu);
+NPBool      NPN_ConvertPoint(NPP instance, double sourceX, double sourceY, NPCoordinateSpace sourceSpace, double *destX, double *destY, NPCoordinateSpace destSpace);
+NPBool      NPN_HandleEvent(NPP instance, void *event, NPBool handled);
+NPBool      NPN_UnfocusInstance(NPP instance, NPFocusDirection direction);
+void        NPN_URLRedirectResponse(NPP instance, void* notifyData, NPBool allow);
+NPError     NPN_InitAsyncSurface(NPP instance, NPSize *size,
+                                           NPImageFormat format, void *initData,
+                                           NPAsyncSurface *surface);
+NPError     NPN_FinalizeAsyncSurface(NPP instance, NPAsyncSurface *surface);
+void        NPN_SetCurrentAsyncSurface(NPP instance, NPAsyncSurface *surface, NPRect *changed);
+*/
